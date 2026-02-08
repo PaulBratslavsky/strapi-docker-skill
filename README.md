@@ -21,58 +21,78 @@ Copy or clone this repository into your Claude Code skills directory:
 
 ## Usage
 
-Open a terminal in your Strapi project directory and invoke the skill in Claude Code:
+Open a terminal in your Strapi project directory and run the skill in Claude Code using the slash command:
 
 ```
-dockerize my strapi project
+/dockerize-strapi
 ```
-
-Other trigger phrases that work:
-
-```
-add docker to strapi
-```
-
-```
-dockerize strapi
-```
-
-```
-containerize my strapi app
-```
-
-The skill will walk you through a few prompts to choose your database, environment, and configuration, then generate all the necessary files.
 
 ## Example Session
 
+Here's a real example of the skill in action on a Strapi v5 TypeScript project:
+
+**1. Invoke the skill**
+
 ```
-You: dockerize strapi
+> /dockerize-strapi
+```
 
-Claude: Detected configuration:
-  - Strapi 5.x (Node 20)
-  - Package manager: yarn
-  - Language: TypeScript
+**2. The skill auto-detects your project**
 
-  [Prompts for database, environment, and config preferences]
+It reads `package.json`, checks for lock files, and detects TypeScript — then reports what it found:
 
-Claude: Dockerize Strapi — Complete!
+```
+Detected configuration:
+  - Strapi v5 (@strapi/strapi: 5.35.0)
+  - TypeScript project
+  - NPM package manager
+  - Project name: test-docker-skill
+```
 
-  Strapi Version:  5.x
+**3. You answer a few prompts**
+
+The skill asks you to pick your preferences via interactive prompts:
+
+- **Database**: PostgreSQL (Recommended), MySQL, or MariaDB
+- **Environment**: Development, Production, or Both
+- **DB credentials**: Use defaults (`strapi/strapi/strapi`) or customize
+
+**4. The skill installs the database driver**
+
+It removes conflicting packages (e.g. `better-sqlite3`) and installs the correct driver (`pg` for PostgreSQL) *before* generating Docker files, so the lock file is up to date inside the image.
+
+```
+npm uninstall better-sqlite3
+npm install pg
+```
+
+**5. All files are generated**
+
+```
+Dockerize Strapi — Complete!
+
+  Strapi Version:  5.35.0
   Database:        PostgreSQL (postgres)
-  Package Manager: yarn
-  Environment:     Both
+  Package Manager: NPM
+  Environment:     Both (development + production)
 
   Generated files:
-    - Dockerfile
-    - Dockerfile.prod
-    - docker-compose.yml
+    - Dockerfile              (development)
+    - Dockerfile.prod         (production)
+    - docker-compose.yml      (with PostgreSQL + Adminer)
     - .dockerignore
-    - config/database.ts
-    - .env (updated)
-
-  Next steps:
-    docker compose up --build
+    - config/env/development/database.ts
+    - config/env/production/database.ts
+    - .env                    (updated)
 ```
+
+**6. Start it up**
+
+```bash
+docker compose up -d --build
+```
+
+Strapi will be available at `http://localhost:1337`.
 
 ## Generated Files
 
