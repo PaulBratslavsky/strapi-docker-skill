@@ -69,7 +69,28 @@ Defaults:
 
 Also ask for the **project name** (default: current directory name).
 
-## Step 4: Generate .dockerignore
+## Step 4: Install Database Driver
+
+Before generating Dockerfiles, install the required database driver into the project so that `package.json` and the lockfile include it. This ensures the driver is available when `npm install` / `yarn install` runs inside the Docker image.
+
+First remove conflicting packages (ignore errors if not installed):
+- Installing `pg` → remove `mysql`, `mysql2`, `better-sqlite3`
+- Installing `mysql2` → remove `pg`, `mysql`, `better-sqlite3`
+- Installing `mysql` → remove `pg`, `mysql2`, `better-sqlite3`
+
+Then install the correct package:
+
+| Database   | Strapi 5 | Strapi 4 |
+|------------|----------|----------|
+| PostgreSQL | `pg`     | `pg`     |
+| MySQL      | `mysql2` | `mysql`  |
+| MariaDB    | `mysql2` | `mysql`  |
+
+Use the detected package manager (`yarn add` / `npm install`).
+
+**This step must happen before generating Dockerfiles** so the updated `package.json` and lockfile are copied into the Docker image during build.
+
+## Step 5: Generate .dockerignore
 
 Write `.dockerignore`:
 
@@ -83,7 +104,7 @@ data/
 .env
 ```
 
-## Step 5: Generate Dockerfile(s)
+## Step 6: Generate Dockerfile(s)
 
 Read the appropriate template from the `templates/` directory relative to this skill file:
 
@@ -103,7 +124,7 @@ Apply these substitutions:
 | `{{DEV_CMD}}`      | `["yarn", "develop"]`                                             | `["npm", "run", "develop"]`                                        |
 | `{{START_CMD}}`    | `["yarn", "start"]`                                               | `["npm", "run", "start"]`                                          |
 
-## Step 6: Generate docker-compose.yml
+## Step 7: Generate docker-compose.yml
 
 Skip if user chose "No" in Step 2.
 
@@ -168,7 +189,7 @@ If Strapi 5, add these to the strapi service environment block:
       TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
 ```
 
-## Step 7: Generate Database Configuration
+## Step 8: Generate Database Configuration
 
 If `config/database.{{ext}}` exists, copy it to `config/database.backup` first.
 
@@ -211,7 +232,7 @@ module.exports = ({ env }) => ({
 });
 ```
 
-## Step 8: Update .env
+## Step 9: Update .env
 
 Check if `.env` contains `@strapi-community/dockerize variables`. If yes, update existing values in place. If no, append:
 
@@ -228,23 +249,6 @@ DATABASE_CLIENT={{CLIENT}}
 ```
 
 `NODE_ENV` value: `development` if environment is Development or Both, `production` if Production only.
-
-## Step 9: Install Database Dependency
-
-First remove conflicting packages (ignore errors if not installed):
-- Installing `pg` → remove `mysql` and `mysql2`
-- Installing `mysql2` → remove `pg` and `mysql`
-- Installing `mysql` → remove `pg` and `mysql2`
-
-Then install the correct package:
-
-| Database   | Strapi 5 | Strapi 4 |
-|------------|----------|----------|
-| PostgreSQL | `pg`     | `pg`     |
-| MySQL      | `mysql2` | `mysql`  |
-| MariaDB    | `mysql2` | `mysql`  |
-
-Use the detected package manager (`yarn add` / `npm install`).
 
 ## Step 10: Print Summary
 
