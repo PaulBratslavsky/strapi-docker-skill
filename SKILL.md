@@ -180,6 +180,23 @@ Read `templates/docker-compose.yml` from the skill directory and apply substitut
       - {{PROJECT_NAME_LOWER}}-data:/var/lib/mysql
 ```
 
+### Database browser (Adminer)
+
+Always include an Adminer service for database management:
+
+```yaml
+  {{PROJECT_NAME_LOWER}}Adminer:
+    container_name: {{PROJECT_NAME_LOWER}}Adminer
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "9090:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER={{PROJECT_NAME_LOWER}}DB
+    networks:
+      - strapi
+```
+
 ### Strapi 5 extra environment variables
 
 If Strapi 5, add these to the strapi service environment block:
@@ -268,5 +285,8 @@ Dockerize Strapi — Complete!
     - .env (updated)
 
   Next steps:
-    docker compose up --build
+    1. docker compose up -d --build
+    2. Access Strapi at: http://localhost:1337
+    3. Access Adminer at: http://localhost:9090
+       (select PostgreSQL/MySQL in the System dropdown)
 ```

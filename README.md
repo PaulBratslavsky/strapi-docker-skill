@@ -92,7 +92,7 @@ Dockerize Strapi — Complete!
 docker compose up -d --build
 ```
 
-Strapi will be available at `http://localhost:1337`.
+Strapi will be available at `http://localhost:1337` and Adminer (database browser) at `http://localhost:9090`.
 
 ## Generated Files
 
@@ -100,7 +100,7 @@ Strapi will be available at `http://localhost:1337`.
 |------|-------------|
 | `Dockerfile` | Development Dockerfile with hot-reload |
 | `Dockerfile.prod` | Multi-stage production Dockerfile (if selected) |
-| `docker-compose.yml` | Compose config with Strapi + database service |
+| `docker-compose.yml` | Compose config with Strapi + database + Adminer |
 | `.dockerignore` | Excludes node_modules, .git, .env, etc. |
 | `config/database.ts\|js` | Database connection config using env vars |
 | `.env` | Updated with database connection variables |
